@@ -51,7 +51,10 @@
     "@loopback/repository": "^1.0.6",
     "@loopback/rest": "^1.4.0",
     "@loopback/rest-explorer": "^1.1.2",
-    "@loopback/service-proxy": "^1.0.3"
+    "@loopback/service-proxy": "^1.0.3",
+    "@types/axios": "^0.14.0",
+    "axios": "^0.18.0",
+    "ory-hydra-sdk": "^1.0.0-beta.9"
   },
   "devDependencies": {
     "@loopback/build": "^1.0.1",
