@@ -55,6 +55,7 @@
     "@loopback/service-proxy": "^1.0.3",
     "@types/axios": "^0.14.0",
     "axios": "^0.18.0",
+    "bcrypt-nodejs": "^0.0.3",
     "memory": "git+https://git@github.com/codejamninja/memory.git#npm",
     "ory-hydra-sdk": "^1.0.0-beta.9",
     "passport": "^0.4.0",
@@ -63,6 +64,7 @@
   "devDependencies": {
     "@loopback/build": "^1.0.1",
     "@loopback/testlab": "^1.0.1",
+    "@types/bcrypt-nodejs": "^0.0.30",
     "@types/node": "^10.11.2",
     "@types/passport": "^1.0.0",
     "@types/passport-http": "^0.3.7",

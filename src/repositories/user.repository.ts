@@ -1,5 +1,10 @@
-import { DefaultCrudRepository } from '@loopback/repository';
+import * as bcrypt from 'bcrypt-nodejs';
 import { inject } from '@loopback/core';
+import {
+  DataObject,
+  DefaultCrudRepository,
+  Options
+} from '@loopback/repository';
 import { MemoryDataSource } from '../datasources';
 import { User } from '../models';
 
@@ -14,5 +19,14 @@ export class UserRepository extends DefaultCrudRepository<
     @inject(`datasources.${datasource}`) dataSource: MemoryDataSource
   ) {
     super(User, dataSource);
+  }
+
+  async create(entity: DataObject<User>, options?: Options): Promise<User> {
+    delete entity.id;
+    entity.password = bcrypt.hashSync(
+      entity.password || '',
+      bcrypt.genSaltSync(10)
+    );
+    return super.create(entity, options);
   }
 }

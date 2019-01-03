@@ -5,7 +5,7 @@ import {
   UserProfile,
   authenticate
 } from '@loopback/authentication';
-import { RequestBody, get, post, requestBody } from '@loopback/rest';
+import { get, post, requestBody } from '@loopback/rest';
 import { User } from '../models';
 import { UserRepository } from '../repositories';
 
