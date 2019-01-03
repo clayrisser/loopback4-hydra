@@ -5,7 +5,7 @@ import {
   DefaultCrudRepository,
   Options
 } from '@loopback/repository';
-import { MemoryDataSource } from '../datasources';
+import { MemoryDataSource, MongoDataSource } from '../datasources';
 import { User } from '../models';
 
 const { env } = process;
@@ -16,7 +16,8 @@ export class UserRepository extends DefaultCrudRepository<
   typeof User.prototype.id
 > {
   constructor(
-    @inject(`datasources.${datasource}`) dataSource: MemoryDataSource
+    @inject(`datasources.${datasource}`)
+    dataSource: MemoryDataSource | MongoDataSource
   ) {
     super(User, dataSource);
   }

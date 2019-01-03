@@ -56,6 +56,7 @@
     "@types/axios": "^0.14.0",
     "axios": "^0.18.0",
     "bcrypt-nodejs": "^0.0.3",
+    "loopback-connector-mongodb": "^4.0.0",
     "memory": "git+https://git@github.com/codejamninja/memory.git#npm",
     "ory-hydra-sdk": "^1.0.0-beta.9",
     "passport": "^0.4.0",

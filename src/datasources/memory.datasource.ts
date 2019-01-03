@@ -1,6 +1,6 @@
 import { inject } from '@loopback/core';
 import { juggler } from '@loopback/repository';
-import * as config from './memory.config';
+import config from './memory.config';
 
 export class MemoryDataSource extends juggler.DataSource {
   static dataSourceName = 'memory';
