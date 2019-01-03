@@ -1,99 +1,45 @@
 import { inject } from '@loopback/context';
-import axios from 'axios';
 import { Response, RestBindings, get, param } from '@loopback/rest';
+import { Hydra, HydraBindings } from '../providers';
+
+const { env } = process;
+const identityUiBaseUrl = env.IDENTITY_UI_BASE_URL || 'http://localhost:6002';
 
 export class HydraController {
-  constructor(@inject(RestBindings.Http.RESPONSE) private res: Response) {}
-
-  @get('/hydra/register')
-  async registerStatus(
-    @param.query.string('login_challenge') challenge: string
-  ): Promise<any> {
-    let body: any;
-    try {
-      const res = await axios.get(
-        `http://localhost:4445/oauth2/auth/requests/register/${challenge}`
-      );
-      body = res.data;
-      return this.res.redirect(body.request_url);
-    } catch (err) {
-      const res = err.response;
-      if (res.status !== 404) throw err;
-      body = res.data;
-    }
-    return { challenge, body };
-  }
+  constructor(
+    @inject(RestBindings.Http.RESPONSE) private res: Response,
+    @inject(HydraBindings.HYDRA_CLIENT) public hydra: Hydra
+  ) {}
 
   @get('/hydra/login')
   async loginStatus(
     @param.query.string('login_challenge') challenge: string
   ): Promise<any> {
-    let body: any = {};
-    try {
-      let res = await axios.get(
-        `http://localhost:4445/oauth2/auth/requests/login/${challenge}`
-      );
-      body = res.data;
-      if (body.skip) {
-        res = await axios.put(
-          `http://localhost:4445/oauth2/auth/requests/login/${challenge}/accept`,
-          {
-            subject: body.subject
-          }
-        );
-      }
-      res = await axios.put(
-        `http://localhost:4445/oauth2/auth/requests/login/${challenge}/accept`,
-        {
-          subject: 'foo@bar.com',
-          remember: true,
-          remember_for: 3600
-        }
-      );
-      body = res.data;
-      return this.res.redirect(body.redirect_to);
-    } catch (err) {
-      const res = err.response;
-      if (res.status !== 404) throw err;
-      body = res.data;
+    const loginRequest: any = await this.hydra.getLoginRequest(challenge);
+    if (loginRequest.skip) {
+      const payload: any = await this.hydra.acceptLoginRequest(challenge, {
+        subject: loginRequest.subject
+      });
+      return this.res.redirect(payload.redirect_to);
     }
-    return { challenge, body };
+    return this.res.redirect(
+      `${identityUiBaseUrl}/login?challenge=${challenge}`
+    );
   }
 
-  @get('/auth/consent')
+  @get('/hydra/consent')
   async consent(
     @param.query.string('consent_challenge') challenge: string
   ): Promise<any> {
-    console.log('challenge', challenge);
-    let body: any = {};
-    try {
-      let res = await axios.get(
-        `http://localhost:4445/oauth2/auth/requests/consent/${challenge}`
-      );
-      body = res.data;
-      if (body.skip) {
-        res = await axios.put(
-          `http://localhost:4445/oauth2/auth/requests/consent/${challenge}/accept`,
-          {
-            session: {}
-          }
-        );
-      }
-      res = await axios.put(
-        `http://localhost:4445/oauth2/auth/requests/consent/${challenge}/accept`,
-        {
-          session: {},
-          remember: true,
-          remember_for: 3600
-        }
-      );
-      body = res.data;
-      return this.res.redirect(body.redirect_to);
-    } catch (err) {
-      const res = err.response;
-      if (res.status !== 404) throw err;
-      body = res.data;
+    const consentRequest: any = await this.hydra.getConsentRequest(challenge);
+    if (consentRequest.skip) {
+      const payload: any = await this.hydra.acceptConsentRequest(challenge, {
+        session: {}
+      });
+      return this.res.redirect(payload.redirect_to);
     }
-    return { challenge, body };
+    return this.res.redirect(
+      `${identityUiBaseUrl}/consent?challenge=${challenge}`
+    );
   }
 }

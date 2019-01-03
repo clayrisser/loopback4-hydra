@@ -10,28 +10,28 @@ export namespace HydraBindings {
 }
 
 export class Hydra {
-  getLoginRequest(challenge: string) {
-    return get('login', challenge);
+  async getLoginRequest(challenge: string) {
+    return await get('login', challenge);
   }
 
-  acceptLoginRequest(challenge: string, body: object) {
-    return put('login', 'accept', challenge, body);
+  async acceptLoginRequest(challenge: string, body: object) {
+    return await put('login', 'accept', challenge, body);
   }
 
-  rejectLoginRequest(challenge: string, body: object) {
-    return put('login', 'reject', challenge, body);
+  async rejectLoginRequest(challenge: string, body: object) {
+    return await put('login', 'reject', challenge, body);
   }
 
-  getConsentRequest(challenge: string) {
-    return get('consent', challenge);
+  async getConsentRequest(challenge: string) {
+    return await get('consent', challenge);
   }
 
-  acceptConsentRequest(challenge: string, body: object) {
-    return put('consent', 'accept', challenge, body);
+  async acceptConsentRequest(challenge: string, body: object) {
+    return await put('consent', 'accept', challenge, body);
   }
 
-  rejectConsentRequest(challenge: string, body: object) {
-    return put('consent', 'reject', challenge, body);
+  async rejectConsentRequest(challenge: string, body: object) {
+    return await put('consent', 'reject', challenge, body);
   }
 }
 
