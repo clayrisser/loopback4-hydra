@@ -4,6 +4,7 @@
   "include": ["src", "test", "index.ts"],
   "exclude": ["node_modules/**", "packages/*/node_modules/**", "**/*.d.ts"],
   "compilerOptions": {
+    "resolveJsonModule": true,
     "experimentalDecorators": true
   }
 }

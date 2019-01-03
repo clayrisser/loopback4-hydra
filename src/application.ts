@@ -1,42 +1,93 @@
-import { BootMixin } from '@loopback/boot';
+import * as path from 'path';
 import { ApplicationConfig } from '@loopback/core';
+import { BootMixin } from '@loopback/boot';
+import { RepositoryMixin } from '@loopback/repository';
+import { RestApplication } from '@loopback/rest';
+import { ServiceMixin } from '@loopback/service-proxy';
+import {
+  AuthenticationBindings,
+  AuthenticationComponent
+} from '@loopback/authentication';
 import {
   RestExplorerBindings,
   RestExplorerComponent
 } from '@loopback/rest-explorer';
-import { RepositoryMixin } from '@loopback/repository';
-import { RestApplication } from '@loopback/rest';
-import { ServiceMixin } from '@loopback/service-proxy';
-import * as path from 'path';
+import * as pkg from '../package.json';
+import {
+  AuthStrategyProvider,
+  HydraBindings,
+  HydraProvider
+} from './providers';
 import { MySequence } from './sequence';
 
 export class IdentityApiApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication))
 ) {
+  bootOptions = {
+    controllers: {
+      dirs: ['controllers'],
+      extensions: ['.controller.js'],
+      nested: true
+    }
+  };
+
   constructor(options: ApplicationConfig = {}) {
-    super(options);
+    super({
+      ...options,
+      rest: {
+        ...options.rest,
+        host: '0.0.0.0'
+      }
+    });
+    this.projectRoot = __dirname;
+    this.addComponents();
+    this.addBindings();
+    this.addSequences();
+    this.addHome();
+    this.addExplorer();
+    this.api({
+      openapi: '3.0.0',
+      info: {
+        title: pkg.name,
+        version: pkg.version
+      },
+      paths: {},
+      components: {
+        securitySchemes: {
+          basicAuth: {
+            scheme: 'basic',
+            type: 'http'
+          },
+          bearerAuth: {
+            scheme: 'bearer',
+            type: 'http'
+          }
+        }
+      }
+    });
+  }
 
-    // Set up the custom sequence
-    this.sequence(MySequence);
+  addBindings() {
+    this.bind(AuthenticationBindings.STRATEGY).toProvider(AuthStrategyProvider);
+    this.bind(HydraBindings.HYDRA_CLIENT).toProvider(HydraProvider);
+  }
 
-    // Set up default home page
-    this.static('/', path.join(__dirname, '../../public'));
+  addComponents() {
+    this.component(AuthenticationComponent);
+  }
 
-    // Customize @loopback/rest-explorer configuration here
+  addExplorer() {
     this.bind(RestExplorerBindings.CONFIG).to({
       path: '/explorer'
     });
     this.component(RestExplorerComponent);
+  }
 
-    this.projectRoot = __dirname;
-    // Customize @loopback/boot Booter Conventions here
-    this.bootOptions = {
-      controllers: {
-        // Customize ControllerBooter Conventions here
-        dirs: ['controllers'],
-        extensions: ['.controller.js'],
-        nested: true
-      }
-    };
+  addHome() {
+    this.static('/', path.join(__dirname, '../../public'));
+  }
+
+  addSequences() {
+    this.sequence(MySequence);
   }
 }
