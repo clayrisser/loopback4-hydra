@@ -26,7 +26,7 @@ export class AuthController {
     ],
     responses: {
       '200': {
-        description: 'Logged in User model instance',
+        description: 'User model instance',
         content: {
           'application/json': { schema: { 'x-ts-type': User } }
         }

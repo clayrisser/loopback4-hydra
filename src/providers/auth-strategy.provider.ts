@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt-nodejs';
 import { BasicStrategy } from 'passport-http';
 import { Provider, inject, ValueOrPromise } from '@loopback/context';
 import { Request } from '@loopback/rest';
@@ -38,7 +39,7 @@ export class AuthStrategyProvider implements Provider<Strategy | undefined> {
   async verifyBasic(
     _req: Request,
     email: string,
-    _password: string,
+    password: string,
     done: (err: Error | null, user?: UserProfile | false) => void
   ) {
     let user: User | null = null;
@@ -46,7 +47,7 @@ export class AuthStrategyProvider implements Provider<Strategy | undefined> {
       where: { email }
     });
     if (users.length) [user] = users;
-    if (user) {
+    if (user && bcrypt.compareSync(password, user.password || '')) {
       return done(null, {
         id: <string>user.id
       });
