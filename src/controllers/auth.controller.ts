@@ -54,10 +54,44 @@ export class AuthController {
         remember: true,
         remember_for: 3600
       });
-      console.log('res', res);
+      console.log('login', res);
       this.res.redirect(res.redirect_to);
     }
     return user;
+  }
+
+  @authenticate('BasicStrategy')
+  @get('/auth/consent', {
+    security: [
+      {
+        basicAuth: []
+      }
+    ],
+    responses: {
+      '200': {
+        description: 'User model instance'
+      }
+    }
+  })
+  async consent(
+    @param.query.string('challenge') challenge?: string
+  ): Promise<null> {
+    if (challenge) {
+      try {
+        const res: any = await this.hydra.acceptConsentRequest(challenge, {
+          grant_scope: ['some-scope'],
+          session: {},
+          remember: true,
+          remember_for: 3600
+        });
+        console.log('consent', res);
+        this.res.redirect(res.redirect_to);
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+    }
+    return null;
   }
 
   @post('/auth/register', {
