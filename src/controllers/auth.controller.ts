@@ -5,21 +5,13 @@ import {
   UserProfile,
   authenticate
 } from '@loopback/authentication';
-import {
-  get,
-  post,
-  requestBody,
-  param,
-  RestBindings,
-  Response
-} from '@loopback/rest';
+import { get, post, requestBody, param } from '@loopback/rest';
 import { User } from '../models';
 import { UserRepository } from '../repositories';
 import { HydraBindings, Hydra } from '../providers';
 
 export class AuthController {
   constructor(
-    @inject(RestBindings.Http.RESPONSE) private res: Response,
     @inject.getter(AuthenticationBindings.CURRENT_USER, { optional: true })
     private getCurrentUser: Getter<UserProfile>,
     @repository(UserRepository)
@@ -45,7 +37,7 @@ export class AuthController {
   })
   async login(
     @param.query.string('challenge') challenge?: string
-  ): Promise<User> {
+  ): Promise<object> {
     const currentUser = await this.getCurrentUser();
     const user = await this.userRepository.findById(currentUser.id);
     if (challenge) {
@@ -54,19 +46,14 @@ export class AuthController {
         remember: true,
         remember_for: 3600
       });
-      console.log('login', res);
-      this.res.redirect(res.redirect_to);
+      return {
+        redirect: res.redirect_to
+      };
     }
     return user;
   }
 
-  @authenticate('BasicStrategy')
-  @get('/auth/consent', {
-    security: [
-      {
-        basicAuth: []
-      }
-    ],
+  @post('/auth/consent', {
     responses: {
       '200': {
         description: 'User model instance'
@@ -75,23 +62,19 @@ export class AuthController {
   })
   async consent(
     @param.query.string('challenge') challenge?: string
-  ): Promise<null> {
+  ): Promise<object> {
     if (challenge) {
-      try {
-        const res: any = await this.hydra.acceptConsentRequest(challenge, {
-          grant_scope: ['some-scope'],
-          session: {},
-          remember: true,
-          remember_for: 3600
-        });
-        console.log('consent', res);
-        this.res.redirect(res.redirect_to);
-      } catch (err) {
-        console.error(err);
-        throw err;
-      }
+      const res: any = await this.hydra.acceptConsentRequest(challenge, {
+        grant_scope: ['some-scope'],
+        session: {},
+        remember: true,
+        remember_for: 3600
+      });
+      return {
+        redirect: res.redirect_to
+      };
     }
-    return null;
+    return {};
   }
 
   @post('/auth/register', {

@@ -3,7 +3,7 @@ import { Response, RestBindings, get, param } from '@loopback/rest';
 import { Hydra, HydraBindings } from '../providers';
 
 const { env } = process;
-const identityUiBaseUrl = env.IDENTITY_UI_BASE_URL || 'http://localhost:6002';
+const identityUiBaseUrl = env.IDENTITY_UI_BASE_URL || 'http://localhost:6001';
 
 export class HydraController {
   constructor(
@@ -22,9 +22,7 @@ export class HydraController {
       });
       return this.res.redirect(payload.redirect_to);
     }
-    return this.res.redirect(
-      `${identityUiBaseUrl}/login?challenge=${challenge}`
-    );
+    return this.res.redirect(`${identityUiBaseUrl}?challenge=${challenge}`);
   }
 
   @get('/hydra/consent')
