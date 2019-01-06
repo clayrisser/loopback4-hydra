@@ -32,12 +32,18 @@ export class HydraController {
     const consentRequest: any = await this.hydra.getConsentRequest(challenge);
     if (consentRequest.skip) {
       const payload: any = await this.hydra.acceptConsentRequest(challenge, {
-        session: {}
+        grant_scope: consentRequest.requested_scope,
+        session: {},
+        grant_access_token_audience:
+          consentRequest.requested_access_token_audience
       });
       return this.res.redirect(payload.redirect_to);
     }
+    const requestedScope = consentRequest.requested_scope
+      ? `&requested_scope=${consentRequest.requested_scope.join('+')}`
+      : '';
     return this.res.redirect(
-      `${identityUiBaseUrl}/consent?challenge=${challenge}`
+      `${identityUiBaseUrl}/consent?challenge=${challenge}${requestedScope}`
     );
   }
 }

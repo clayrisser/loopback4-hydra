@@ -61,11 +61,12 @@ export class AuthController {
     }
   })
   async consent(
+    @requestBody() body: { grantScope: string[] },
     @param.query.string('challenge') challenge?: string
   ): Promise<object> {
     if (challenge) {
       const res: any = await this.hydra.acceptConsentRequest(challenge, {
-        grant_scope: ['some-scope'],
+        grant_scope: body.grantScope,
         session: {},
         remember: true,
         remember_for: 3600
