@@ -29,7 +29,9 @@ yarn
 
 ## Usage
 
-[Contribute](https://github.com/codejamninja/identity-api/blob/master/CONTRIBUTING.md) usage docs
+I created a frontend to test this login provider at the link below.
+
+https://github.com/codejamninja/login-ui
 
 
 ## Support
